@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comércio Do Luiz💨</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-inner">
+    <div class="logo">🛍️ Comércio Do Luiz💨</div>
+    <div class="conta-area" id="areaConta"></div>
+  </div>
+  <nav class="abas">
+    <button class="aba-btn ativo" data-aba="loja">🛍️ Loja</button>
+    <button class="aba-btn" data-aba="pedidos">📋 Meus Pedidos</button>
+    <button class="aba-btn" data-aba="admin">⚙️ Administração</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ABA LOJA -->
+  <section class="secao ativa" id="secao-loja">
+    <div class="loja-topo">
+      <h1>Produtos</h1>
+    </div>
+    <div class="grid-produtos" id="gridProdutos"></div>
+  </section>
+
+  <!-- ABA PEDIDOS -->
+  <section class="secao" id="secao-pedidos">
+    <h1 style="margin-bottom:16px;">Meus Pedidos</h1>
+    <div id="listaPedidos"></div>
+  </section>
+
+  <!-- ABA ADMIN -->
+  <section class="secao" id="secao-admin">
+    <div id="adminConteudo"></div>
+  </section>
+
+</main>
+
+<button class="carrinho-fab" id="btnCarrinho" onclick="abrirCarrinho()">
+  🛒 Carrinho <span class="badge" id="badgeCarrinho">0</span>
+</button>
+
+<!-- MODAL LOGIN CLIENTE -->
+<div class="overlay" id="overlayLogin">
+  <div class="modal">
+    <button class="fechar-modal" onclick="fecharModal('overlayLogin')">✕</button>
+    <h2>Entrar</h2>
+    <div class="sub">Acesse sua conta para ver seus pedidos</div>
+    <div class="erro-msg" id="erroLogin"></div>
+    <div class="campo">
+      <label>E-mail</label>
+      <input type="email" id="loginEmail" placeholder="seu@email.com">
+    </div>
+    <div class="campo">
+      <label>Senha</label>
+      <input type="password" id="loginSenha" placeholder="Sua senha">
+    </div>
+    <button class="btn btn-primario btn-full" onclick="fazerLoginCliente()">Entrar</button>
+    <div class="troca-link">Não tem conta? <a onclick="trocarParaCadastro()">Criar conta</a></div>
+  </div>
+</div>
+
+<!-- MODAL CRIAR CONTA -->
+<div class="overlay" id="overlayCadastro">
+  <div class="modal">
+    <button class="fechar-modal" onclick="fecharModal('overlayCadastro')">✕</button>
+    <h2>Criar conta</h2>
+    <div class="sub">Cadastre-se para acompanhar seus pedidos</div>
+    <div class="erro-msg" id="erroCadastro"></div>
+    <div class="campo">
+      <label>Nome completo</label>
+      <input type="text" id="cadNome" placeholder="Seu nome">
+    </div>
+    <div class="campo">
+      <label>E-mail</label>
+      <input type="email" id="cadEmail" placeholder="seu@email.com">
+    </div>
+    <div class="campo">
+      <label>Senha</label>
+      <input type="password" id="cadSenha" placeholder="Crie uma senha (mín. 4 caracteres)">
+    </div>
+    <button class="btn btn-primario btn-full" onclick="criarConta()">Criar conta</button>
+    <div class="troca-link">Já tem conta? <a onclick="trocarParaLogin()">Entrar</a></div>
+  </div>
+</div>
+
+<!-- MODAL CARRINHO -->
+<div class="overlay" id="overlayCarrinho">
+  <div class="modal">
+    <button class="fechar-modal" onclick="fecharModal('overlayCarrinho')">✕</button>
+    <h2>Seu carrinho</h2>
+    <div class="sub">Revise os itens antes de finalizar</div>
+    <div id="itensCarrinhoModal"></div>
+    <div id="carrinhoVazioMsg" class="vazio" style="display:none;padding:30px 10px;">
+      <div class="emoji">🛒</div>
+      Seu carrinho está vazio
+    </div>
+    <div class="carrinho-total" id="totalCarrinho"></div>
+    <button class="btn btn-primario btn-full" style="margin-top:14px;" onclick="irParaPagamento()" id="btnFinalizarCompra">
+      Finalizar compra
+    </button>
+  </div>
+</div>
+
+<!-- MODAL PAGAMENTO -->
+<div class="overlay" id="overlayPagamento">
+  <div class="modal modal-lg">
+    <button class="fechar-modal" onclick="fecharModal('overlayPagamento')">✕</button>
+    <h2>Pagamento</h2>
+    <div class="sub">Finalize seu pedido com segurança</div>
+
+    <div class="resumo-pedido" id="resumoPedidoPagamento"></div>
+
+    <div class="campo">
+      <label>Nome do cliente</label>
+      <input type="text" id="pagNome" placeholder="Nome completo">
+    </div>
+    <div class="campo">
+      <label>E-mail</label>
+      <input type="email" id="pagEmail" placeholder="seu@email.com">
+    </div>
+    <div class="campo">
+      <label>CEP de entrega</label>
+      <input type="text" id="pagCep" placeholder="00000-000" maxlength="9" oninput="mascaraCep(this)">
+    </div>
+
+    <div class="metodo-pag">
+      <label><input type="radio" name="metodo" value="pix" checked onchange="atualizarMetodoPag()"><span>💠 Pix</span></label>
+      <label><input type="radio" name="metodo" value="cartao" onchange="atualizarMetodoPag()"><span>💳 Cartão</span></label>
+    </div>
+
+    <div id="camposCartao">
+      <div class="campo">
+        <label>Número do cartão</label>
+        <input type="text" id="cartaoNumero" placeholder="0000 0000 0000 0000" maxlength="19">
+      </div>
+      <div class="linha2">
+        <div class="campo">
+          <label>Validade</label>
+          <input type="text" id="cartaoValidade" placeholder="MM/AA" maxlength="5">
+        </div>
+        <div class="campo">
+          <label>CVV</label>
+          <input type="text" id="cartaoCvv" placeholder="123" maxlength="4">
+        </div>
+      </div>
+    </div>
+    <div id="campoPix" style="display:none;font-size:13px;color:var(--cinza-texto);background:var(--cinza-fundo);padding:14px;border-radius:8px;margin-bottom:14px;">
+      Um QR Code Pix seria exibido aqui para pagamento instantâneo.
+    </div>
+
+    <div class="erro-msg" id="erroPagamento"></div>
+    <button class="btn btn-primario btn-full" onclick="confirmarPagamento()">Confirmar pagamento</button>
+  </div>
+</div>
+
+<!-- MODAL LOGIN ADMIN (dentro da aba admin, não é overlay) -->
+
+<!-- MODAL PRODUTO (admin) -->
+<div class="overlay" id="overlayProduto">
+  <div class="modal">
+    <button class="fechar-modal" onclick="fecharModal('overlayProduto')">✕</button>
+    <h2 id="tituloModalProduto">Novo produto</h2>
+    <div class="sub">Preencha os dados do produto</div>
+    <div class="erro-msg" id="erroProduto"></div>
+    <input type="hidden" id="produtoId">
+    <div class="campo">
+      <label>Nome do produto</label>
+      <input type="text" id="produtoNome" placeholder="Ex: Tênis Esportivo">
+    </div>
+    <div class="campo">
+      <label>Descrição</label>
+      <textarea id="produtoDesc" rows="2" placeholder="Breve descrição do produto"></textarea>
+    </div>
+    <div class="linha2">
+      <div class="campo">
+        <label>Preço (R$)</label>
+        <input type="number" id="produtoPreco" step="0.01" min="0" placeholder="0,00">
+      </div>
+      <div class="campo">
+        <label>Estoque</label>
+        <input type="number" id="produtoEstoque" min="0" placeholder="0">
+      </div>
+    </div>
+    <div class="campo">
+      <label>Emoji / ícone do produto</label>
+      <input type="text" id="produtoEmoji" placeholder="Ex: 👟" maxlength="4">
+    </div>
+    <button class="btn btn-primario btn-full" onclick="salvarProduto()">Salvar produto</button>
+  </div>
+</div>
+
+<!-- MODAL DETALHES PEDIDO -->
+<div class="overlay" id="overlayDetalhesPedido">
+  <div class="modal">
+    <button class="fechar-modal" onclick="fecharModal('overlayDetalhesPedido')">✕</button>
+    <h2>Detalhes do pedido</h2>
+    <div id="detalhesPedidoConteudo"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
